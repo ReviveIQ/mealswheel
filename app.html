@@ -875,8 +875,8 @@ async function favoriteRecipe(id, btn) {
 }
 
 function shareRecipe(name){
-  if(navigator.share){navigator.share({title:'MealsWheel Recipe',text:`Check out this recipe: ${name}`,url:'https://reviveiq.github.io/mealswheel'});}
-  else{navigator.clipboard.writeText('https://reviveiq.github.io/mealswheel').then(()=>alert('Link copied!'));}
+  if(navigator.share){navigator.share({title:'MealsWheel Recipe',text:`Check out this recipe: ${name}`,url:'https://reviveiq.github.io/mealwheeliq'});}
+  else{navigator.clipboard.writeText('https://reviveiq.github.io/mealwheeliq').then(()=>alert('Link copied!'));}
 }
 
 // ─── SECTIONS & MODES ────────────────────────────────────────────────────────
@@ -997,14 +997,14 @@ let shareRecipeName = '';
 
 function shareRecipe(name) {
   shareRecipeName = name;
-  const url = `https://reviveiq.github.io/mealswheel?recipe=${encodeURIComponent(name)}`;
+  const url = `https://reviveiq.github.io/mealwheeliq?recipe=${encodeURIComponent(name)}`;
   document.getElementById('share-url-input').value = url;
   document.getElementById('share-modal').classList.remove('hidden');
 }
 
 function shareRecipeById(id, name) {
   shareRecipeName = name;
-  const url = `https://reviveiq.github.io/mealswheel?recipe=${encodeURIComponent(name)}&id=${id}`;
+  const url = `https://reviveiq.github.io/mealwheeliq?recipe=${encodeURIComponent(name)}&id=${id}`;
   document.getElementById('share-url-input').value = url;
   document.getElementById('share-modal').classList.remove('hidden');
 }
