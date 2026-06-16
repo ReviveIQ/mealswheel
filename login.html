@@ -108,18 +108,23 @@ footer a{color:var(--ink3)}
       <div class="divider">Choose your plan</div>
       <div class="plan-pills">
         <div class="plan-pill selected" id="pill-free" onclick="selectPlan('free')">
-          <div class="pp-name">Free</div>
-          <div class="pp-price">$0 / mo</div>
-          <div style="font-size:10px;color:var(--ink3);margin-top:3px">5 spins/mo</div>
+          <div class="pp-name">Free Trial</div>
+          <div class="pp-price">$0 — 5 spins</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:3px">No credit card</div>
+        </div>
+        <div class="plan-pill" id="pill-trial" onclick="selectPlan('trial')">
+          <div class="pp-name">Weekly Trial</div>
+          <div class="pp-price">$4.99 / week</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:3px">Full access</div>
         </div>
         <div class="plan-pill" id="pill-home_chef" onclick="selectPlan('home_chef')">
           <div class="pp-name">Home Chef</div>
-          <div class="pp-price">$4.99 / mo</div>
+          <div class="pp-price">$9.99 / mo</div>
           <span class="pp-badge">Popular</span>
         </div>
         <div class="plan-pill" id="pill-family" onclick="selectPlan('family')">
           <div class="pp-name">Family</div>
-          <div class="pp-price">$9.99 / mo</div>
+          <div class="pp-price">$19.99 / mo</div>
           <div style="font-size:10px;color:var(--ink3);margin-top:3px">4 profiles</div>
         </div>
       </div>
@@ -147,7 +152,7 @@ function showTab(tab) {
 
 function selectPlan(plan) {
   selectedPlan = plan;
-  ['free','home_chef','family'].forEach(p => {
+  ['free','trial','home_chef','family'].forEach(p => {
     document.getElementById('pill-'+p).classList.toggle('selected', p === plan);
   });
 }
