@@ -628,14 +628,14 @@ function spin() {
 async function generateRecipe(wi) {
   const resultEl=document.getElementById('results'),cardsEl=document.getElementById('rcards');
   document.getElementById('rh').textContent = mode==='week'?`Week in progress — ${wk.length+1}/5 generating...`:'Chef Claude is cooking...';
-  cardsEl.innerHTML=`<div class="loading-card"><div class="loading-spinner"></div><p>Crafting your recipe from <strong>${selectedIngs.size} ingredients</strong>...</p><p style="font-size:11px;margin-top:4px;color:var(--ink3)">Bobby Flay energy · Real technique · Organic-forward</p></div>`;
+  cardsEl.innerHTML=`<div class="loading-card"><div class="loading-spinner"></div><p>Crafting your recipe from <strong>${selectedIngs.size} ingredients</strong>...</p><p style="font-size:11px;margin-top:4px;color:var(--ink3)">Bold flavors · Real technique · Organic-forward</p></div>`;
   resultEl.classList.remove('hidden');
   resultEl.scrollIntoView({behavior:'smooth',block:'start'});
 
   const ingList=Array.from(selectedIngs).join(', ');
   const s=parseInt(document.getElementById('servings').value)||2;
   const g=parseInt(document.getElementById('calgoal').value)||2000;
-  const styleGuides={"Tonight's Pick":"a flavorful satisfying weeknight dinner","Family Fave":"a crowd-pleasing family comfort food dish","Chef's Special":"an elevated technique-forward dish inspired by Bobby Flay","Something New":"a creative unexpected flavor combination","Quick Meal":"a fast under-30-minute dinner","Weekend Cook":"a slow-cooked BBQ or weekend project recipe","Comfort Food":"a warming cozy comfort food dinner","Seasonal Dish":"a fresh produce-forward seasonal recipe"};
+  const styleGuides={"Tonight's Pick":"a flavorful satisfying weeknight dinner","Family Fave":"a crowd-pleasing family comfort food dish","Chef's Special":"an elevated technique-forward dish with bold flavors and expert technique","Something New":"a creative unexpected flavor combination","Quick Meal":"a fast under-30-minute dinner","Weekend Cook":"a slow-cooked BBQ or weekend project recipe","Comfort Food":"a warming cozy comfort food dinner","Seasonal Dish":"a fresh produce-forward seasonal recipe"};
   const styleHint=styleGuides[WHEEL_LABELS[wi]]||"a delicious dinner";
   const avoidStr=wk.length?`Do NOT repeat: ${wk.map(r=>r.name).join(', ')}.`:'';
   const dietStr=getDietPromptText();
@@ -644,7 +644,7 @@ async function generateRecipe(wi) {
   const buyRule = mode==='week'
     ? 'You may suggest additional ingredients to buy as needed — mark them buy:true.'
     : 'STRICT PANTRY RULE: no more than 40% of ingredients may have buy:true. Prioritize what the user already has.';
-  const prompt=`You are a professional chef inspired by Bobby Flay. Generate ${count} dinner recipe${count>1?'s':''} that ${count>1?'are':'is'} ${styleHint}.
+  const prompt=`You are a professional chef with expertise in bold flavors, live-fire cooking, and fresh ingredients. Generate ${count} dinner recipe${count>1?'s':''} that ${count>1?'are':'is'} ${styleHint}.
 User's available ingredients: ${ingList}
 Requirements: use primarily these ingredients, flag buy:true for extras needed, flag organic:true for meats/eggs/leafy greens/thin-skin produce, servings: ${s}, daily calorie goal: ${g} kcal, ${avoidStr} ${dietStr} family-friendly.
 ${buyRule}
