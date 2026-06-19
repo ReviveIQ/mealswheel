@@ -788,6 +788,8 @@ async function savePantry() {
 
 // ─── INGREDIENT UI ───────────────────────────────────────────────────────────
 function buildIngUI() {
+  // Legacy function — pantry is now managed via pantry modal
+  if (!document.getElementById('ing-cats') || !document.getElementById('ing-grid')) return;
   const cats = ['All', ...Object.keys(INGREDIENT_DB)];
   document.getElementById('ing-cats').innerHTML = cats.map(c =>
     `<button class="cat-btn${c==='All'?' act':''}" onclick="setCat('${c}')">${c}</button>`
@@ -804,6 +806,7 @@ function setCat(cat) {
 }
 
 function renderGrid() {
+  if (!document.getElementById('ing-grid') || !document.getElementById('ing-search')) return;
   const search = document.getElementById('ing-search').value.toLowerCase();
   let items = activeCat === 'All' ? Object.values(INGREDIENT_DB).flat() : (INGREDIENT_DB[activeCat] || []);
   if (search) items = items.filter(i => i.toLowerCase().includes(search));
