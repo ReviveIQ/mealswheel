@@ -214,6 +214,12 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
 .stab{padding:8px 14px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
 .stab.act{color:var(--coral);border-bottom-color:var(--coral)}
 
+/* ── ONBOARDING STEPS ── */
+.onboard-steps{display:flex;align-items:center;gap:6px;margin-bottom:.75rem;flex-wrap:wrap}
+.ostep{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:var(--bg);color:var(--ink3);border:1px solid var(--border)}
+.ostep.active{background:var(--green-pale);color:var(--green-dark);border-color:var(--green)}
+.ostep.done{background:var(--ink1);color:white;border-color:var(--ink1)}
+.ostep-arrow{font-size:11px;color:var(--ink3)}
 /* ── PANTRY MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
 .modal-box{background:var(--card);border-radius:16px;width:100%;max-width:520px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
@@ -310,8 +316,15 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
   <div id="pantry-modal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-header">
+        <div class="onboard-steps">
+          <span class="ostep done">1 Sign up</span>
+          <span class="ostep-arrow">→</span>
+          <span class="ostep active">2 Stock your kitchen</span>
+          <span class="ostep-arrow">→</span>
+          <span class="ostep">3 Spin & eat</span>
+        </div>
         <h2>🛒 What's in your kitchen?</h2>
-        <p>Tell us what you have and we'll spin recipes you can actually make.</p>
+        <p>Add what you have in your fridge, pantry, and freezer. We'll build recipes around it — no extra shopping needed.</p>
       </div>
       <div class="pantry-tabs">
         <button class="ptab active" onclick="setPantryTab('saved')">My Pantry</button>
@@ -338,7 +351,7 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
         <div class="pantry-count-label" id="pantry-count-label">0 items in your pantry</div>
         <div class="modal-actions">
           <button class="btn-ghost" onclick="savePantryAndClose()">Done</button>
-          <button class="btn-primary" onclick="savePantryAndClose()">Save & Spin 🎰</button>
+          <button class="btn-primary" onclick="savePantryAndClose()">Save & Start Spinning 🎰</button>
         </div>
       </div>
     </div>
