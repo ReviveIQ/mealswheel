@@ -285,6 +285,141 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
 .edit-pantry-btn:hover{border-color:var(--green);color:var(--green-dark)}
 .ps-tag{font-size:11px;padding:.2rem .55rem;border-radius:12px;background:var(--green-pale);color:var(--green-dark);border:1px solid #b8e8d4}
 
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE-FIRST RESPONSIVE STYLES
+   Base styles above are desktop. These override for mobile.
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* ── Layout ── */
+  .app { padding: .75rem .85rem 5rem; }
+
+  /* ── Nav ── */
+  nav { padding: .6rem .85rem; }
+  .nav-logo { font-size: 1.15rem; }
+  .nav-user { display: none; } /* hide email on mobile — too long */
+  .nav-btn { padding: 5px 10px; font-size: 11px; }
+  .nav-plan { font-size: 10px; padding: 2px 8px; }
+
+  /* ── Spin counter ── */
+  .spin-counter { padding: .5rem .75rem; gap: 6px; }
+  .spin-bar-wrap { max-width: none; flex: 1; }
+
+  /* ── Wheel ── */
+  .ww { width: 280px !important; height: 280px !important; margin: 0 auto; }
+  #wc { width: 280px !important; height: 280px !important; }
+
+  /* ── Spin button ── */
+  #sbtn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 16px;
+    border-radius: 16px;
+    margin-top: .75rem;
+  }
+
+  /* ── Stats row ── */
+  #cstats { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+  .cst { padding: 8px; }
+  .cst .cv { font-size: 18px; }
+  .cst .cl { font-size: 10px; }
+
+  /* ── Section tabs ── */
+  .stabs { gap: 4px; }
+  .stab { font-size: 12px; padding: .45rem .6rem; }
+
+  /* ── Dietary filters ── */
+  .diet-filters { gap: 5px; }
+  .diet-btn { font-size: 12px; padding: .4rem .7rem; min-height: 36px; }
+
+  /* ── Pantry panel ── */
+  #pantry-panel { padding: .75rem; }
+  .edit-pantry-btn { font-size: 12px; padding: .35rem .8rem; min-height: 36px; }
+  .ps-tag { font-size: 12px; padding: .3rem .65rem; }
+
+  /* ── Recipe cards ── */
+  .rcard { border-radius: 14px; }
+  .rch { padding: .85rem; }
+  .rname { font-size: 16px !important; }
+  .rmeta { flex-wrap: wrap; gap: 5px; }
+  .cb { font-size: 11px; padding: 3px 8px; }
+  .ingredients-grid { grid-template-columns: 1fr 1fr !important; }
+  .ing { font-size: 12px; padding: .3rem .55rem; }
+  .step { font-size: 14px; line-height: 1.6; padding: .6rem 0; }
+  .step-num { width: 22px; height: 22px; font-size: 11px; flex-shrink: 0; }
+  .card-actions { flex-wrap: wrap; gap: 8px; }
+  .card-action-btn { flex: 1; min-width: 120px; font-size: 13px; padding: .55rem .75rem; }
+  .star-rating { justify-content: center; }
+  .star { font-size: 24px; }
+
+  /* ── History ── */
+  .history-item { padding: .65rem; }
+  .hi-emoji { font-size: 24px; }
+  .hi-name { font-size: 13px; }
+  .hi-meta { font-size: 11px; }
+  #history-search { font-size: 14px; } /* prevent iOS zoom on focus */
+
+  /* ── Loading card ── */
+  .loading-card { padding: 2.5rem 1rem; }
+
+  /* ── Upgrade banner ── */
+  #upgrade-banner { border-radius: 12px; padding: .85rem 1rem; }
+
+  /* ── Week mode grid ── */
+  .wk-grid { grid-template-columns: repeat(5, 1fr); font-size: 10px; }
+  .wk-day { padding: 4px; }
+
+  /* ── Grocery list ── */
+  .gl-item { font-size: 14px; padding: .55rem 0; }
+
+  /* ── Modal ── */
+  .modal-overlay { padding: .5rem; align-items: flex-end; } /* sheet from bottom */
+  .modal-box { border-radius: 20px 20px 0 0; max-height: 92vh; }
+  .modal-header { padding: 1rem 1.25rem .75rem; }
+  .modal-header h2 { font-size: 18px; }
+  .ptab { font-size: 13px; padding: .6rem; min-height: 44px; }
+  .ptab-content { padding: .85rem 1.25rem; }
+  .pantry-search-row input { font-size: 16px; } /* prevent iOS zoom */
+  .pantry-add-btn { font-size: 14px; min-height: 44px; padding: 0 1rem; }
+  .pantry-chip { font-size: 13px; padding: .4rem .8rem; min-height: 36px; }
+  .modal-footer { padding: .75rem 1.25rem; }
+  .btn-ghost, .btn-primary { font-size: 14px; padding: .6rem 1.1rem; min-height: 44px; }
+
+  /* ── Welcome overlay ── */
+  .welcome-box { border-radius: 20px 20px 0 0; }
+  .welcome-step { padding: 1.5rem 1.25rem; }
+  .welcome-emoji { font-size: 40px; }
+  .welcome-box h2 { font-size: 20px; }
+  .chef-name-input { font-size: 16px; } /* prevent iOS zoom */
+  .chef-sug { font-size: 13px; padding: .4rem .9rem; min-height: 36px; }
+  .btn-full { min-height: 52px; font-size: 16px; }
+  .welcome-pantry-cats { max-height: 200px; }
+
+  /* ── Tonight extras bar ── */
+  #tonight-extras-bar { font-size: 12px; }
+
+  /* ── Panel titles ── */
+  .panel-title { font-size: 13px; }
+  .panel-title-row { margin-bottom: .5rem; }
+
+  /* ── Progress bar ── */
+  #pbwrap { padding: .6rem .75rem; }
+  #pbl, #pbr { font-size: 11px; }
+}
+
+/* ── Touch-friendly tap targets globally ── */
+@media (hover: none) and (pointer: coarse) {
+  .diet-btn, .stab, .card-action-btn, .pantry-chip,
+  .pantry-add-btn, .btn-primary, .btn-ghost, #sbtn {
+    min-height: 44px;
+  }
+  .star { font-size: 28px; padding: 4px; }
+}
+
+/* ── Prevent double-tap zoom on buttons ── */
+button, a { touch-action: manipulation; }
+
 </style>
 </head>
 <body>
@@ -546,7 +681,7 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
   <div id="section-history" class="hidden">
     <div class="history-panel">
       <div class="panel-title">Recent recipes</div>
-      <input type="text" class="search-bar" id="history-search" placeholder="🔍 Search your recipe history..." oninput="filterHistory()">
+      <input type="text" class="search-bar" id="history-search" style="font-size:16px" placeholder="🔍 Search your recipe history..." oninput="filterHistory()">
       <div class="history-list" id="history-list">
         <div class="empty-state">Spin the wheel to start building your recipe history!</div>
       </div>
