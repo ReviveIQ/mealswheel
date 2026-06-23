@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MealWheelIQ — Dinner. Solved. Every Night.</title>
-<meta name="description" content="Stop arguing about what's for dinner. MealWheelIQ spins up AI-generated recipes from what's already in your fridge — organic, flavorful, and done in minutes.">
+<title>MealsWheel — Dinner. Solved.</title>
+<meta name="description" content="Stop arguing about what's for dinner. MealsWheel spins up AI-generated recipes from what's already in your fridge — organic, flavorful, and done in minutes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -222,6 +222,17 @@ nav {
 .orbit-tag:nth-child(4) { top: 45%; right: -15%; animation-delay: -2s; }
 .orbit-tag:nth-child(5) { bottom: 10%; left: 0%; animation-delay: -2.5s; }
 .orbit-tag:nth-child(6) { bottom: 10%; right: 0%; animation-delay: -3s; }
+
+@media (max-width: 600px) {
+  .orbit-tags { inset: -30px; }
+  .orbit-tag { font-size: 11px; padding: 5px 10px; }
+  .orbit-tag:nth-child(1) { top: 5%; left: -2%; }
+  .orbit-tag:nth-child(2) { top: 5%; right: -2%; }
+  .orbit-tag:nth-child(3) { display: none; }
+  .orbit-tag:nth-child(4) { display: none; }
+  .orbit-tag:nth-child(5) { bottom: 5%; left: 2%; }
+  .orbit-tag:nth-child(6) { bottom: 5%; right: 2%; }
+}
 
 /* ── SECTION SHARED ── */
 section { padding: 5rem 2rem; }
@@ -501,7 +512,7 @@ footer a:hover { color: white; }
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">MealWheel<span>IQ</span></a>
+  <a href="#" class="nav-logo">Meals<span>Wheel</span></a>
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#features">Features</a>
@@ -520,7 +531,7 @@ footer a:hover { color: white; }
   <h1>Dinner. <em>Solved.</em><br>Every single night.</h1>
 
   <p class="hero-sub">
-    Stop arguing about what's for dinner. MealWheelIQ spins up AI-generated recipes from what's already in your fridge — organic, flavorful, and ready in minutes.
+    Stop arguing about what's for dinner. MealsWheel spins up AI-generated recipes from what's already in your fridge — organic, flavorful, and ready in minutes.
   </p>
 
   <form class="hero-form" onsubmit="handleHeroSubmit(event)">
@@ -641,7 +652,7 @@ footer a:hover { color: white; }
         <strong>USDA Certified Organic</strong> produce contains no synthetic pesticides or GMOs.
         <strong>Harvard T.H. Chan School of Public Health</strong> research links organic diets to measurably lower pesticide exposure — especially important for children.
         Organic livestock cannot receive antibiotics or growth hormones. The <strong>World Health Organization</strong> identifies routine antibiotic use in livestock as a primary driver of global antibiotic resistance.
-        MealWheelIQ flags organic priorities on every recipe so you know exactly where to spend the extra dollar.
+        MealsWheel flags organic priorities on every recipe so you know exactly where to spend the extra dollar.
       </p>
     </div>
   </div>
@@ -719,7 +730,7 @@ footer a:hover { color: white; }
 <!-- WAITLIST CTA -->
 <section class="waitlist-section" id="waitlist">
   <h2>Stop dreading the question.<br>Start spinning.</h2>
-  <p>Join the waitlist and be first through the door when MealWheelIQ launches. Early members get Home Chef free for 3 months.</p>
+  <p>Join the waitlist and be first through the door when MealsWheel launches. Early members get Home Chef free for 3 months.</p>
 
   <form class="waitlist-form" id="waitlist-form" onsubmit="handleWaitlist(event)">
     <input type="email" id="waitlist-email" placeholder="Your email address" required>
@@ -734,14 +745,14 @@ footer a:hover { color: white; }
 
 <!-- FOOTER -->
 <footer>
-  <a href="#" class="footer-logo">MealWheel<span>IQ</span></a>
+  <a href="#" class="footer-logo">Meals<span>Wheel</span></a>
   <p>
     Built for families who cook. &nbsp;·&nbsp;
     <a href="mailto:hello@mealswheel.com">hello@mealswheel.com</a> &nbsp;·&nbsp;
     <a href="#">Privacy</a> &nbsp;·&nbsp;
     <a href="#">Terms</a>
   </p>
-  <p style="margin-top:.5rem">© 2026 MealWheelIQ. Spin it. Cook it. Love it.</p>
+  <p style="margin-top:.5rem">© 2026 MealsWheel. Spin it. Cook it. Love it.</p>
 </footer>
 
 <script>
@@ -764,9 +775,20 @@ function drawDemoWheel(angle) {
     ctx.fillStyle = WC[i]; ctx.fill();
     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
     ctx.save(); ctx.rotate(i*arc + arc/2);
-    ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.font = '600 11px Cabinet Grotesk, sans-serif';
-    ctx.fillText(labels[i], r - 10, 4);
+    // Determine if this segment is on the bottom half — if so, flip text
+    const segAngle = (angle + i*arc + arc/2) % (2*Math.PI);
+    const normalised = segAngle < 0 ? segAngle + 2*Math.PI : segAngle;
+    if (normalised > Math.PI) {
+      // Bottom half — flip so text reads correctly
+      ctx.rotate(Math.PI);
+      ctx.textAlign = 'left';
+      ctx.fillText(labels[i], -(r - 10), 4);
+    } else {
+      ctx.textAlign = 'right';
+      ctx.fillText(labels[i], r - 10, 4);
+    }
     ctx.restore();
   }
   ctx.restore();
