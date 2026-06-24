@@ -30,6 +30,8 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .nav-plan{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:var(--gold-pale);color:var(--gold);border:1px solid rgba(184,134,11,.2)}
 .nav-plan.pro{background:var(--green-pale);color:var(--green);border-color:rgba(42,107,74,.2)}
 .nav-user{font-size:12px;color:var(--ink2);font-weight:500}
+.nav-chef{font-size:12px;color:var(--ink2);font-weight:600;cursor:pointer;padding:4px 8px;border-radius:10px;transition:background .15s;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis}
+.nav-chef:hover{background:var(--green-pale);color:var(--green-dark)}
 .nav-btn{padding:6px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border2);background:transparent;color:var(--ink2)}
 .nav-btn:hover{background:var(--card);color:var(--ink)}
 .nav-btn.upgrade{background:var(--coral);color:white;border-color:var(--coral)}
@@ -299,6 +301,7 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
   nav { padding: .6rem .85rem; }
   .nav-logo { font-size: 1.15rem; }
   .nav-user { display: none; } /* hide email on mobile — too long */
+  .nav-chef { max-width: 80px; font-size: 11px; }
   .nav-btn { padding: 5px 10px; font-size: 11px; }
   .nav-plan { font-size: 10px; padding: 2px 8px; }
 
@@ -428,9 +431,9 @@ button, a { touch-action: manipulation; }
   <a href="index.html" class="nav-logo">MealWheel<span>IQ</span></a>
   <div class="nav-right">
     <span class="nav-plan" id="nav-plan">Free</span>
-    <span class="nav-user" id="nav-user"></span>
+    <span class="nav-chef" id="nav-chef" onclick="openChefRename()" title="Tap to rename your chef">👨‍🍳</span>
     <button class="nav-btn upgrade hidden" id="upgrade-btn" onclick="upgradeAccount('trial')">Upgrade</button>
-    <button class="nav-btn" onclick="signOut()">Sign Out</button>
+    <button class="nav-btn" onclick="signOut()">Sign out</button>
   </div>
 </nav>
 
@@ -748,7 +751,8 @@ async function initApp() {
 
 function updateNavUI() {
   const email = userInfo.email || '';
-  document.getElementById('nav-user').textContent = email.split('@')[0];
+  document.getElementById('nav-user') && (document.getElementById('nav-user').textContent = email.split('@')[0]);
+  updateNavChefName();
   const planEl = document.getElementById('nav-plan');
   if (userPlan === 'home_chef') { planEl.textContent = 'Home Chef'; planEl.classList.add('pro'); }
   else if (userPlan === 'family') { planEl.textContent = 'Family'; planEl.classList.add('pro'); }
@@ -1030,20 +1034,31 @@ function setChefName(name) {
 async function saveChefAndNext() {
   const input = document.getElementById('chef-name-input').value.trim();
   chefName = input || 'Chef';
-  // Save to preferences
+  // Save chef name to preferences
   try {
-    const prefs = await fetch(API + '/preferences', {
-      headers: { 'Authorization': 'Bearer ' + userToken }
-    }).then(r => r.json());
-    await fetch(API + '/preferences', {
+    // Get current prefs first, fall back to defaults if missing
+    let prefs = { daily_calorie_goal: 2000, servings: 2, dietary_preferences: [], chef_name: chefName };
+    try {
+      const r = await fetch(API + '/preferences', { headers: { 'Authorization': 'Bearer ' + userToken } });
+      if (r.ok) { const p = await r.json(); prefs = { ...prefs, ...p, chef_name: chefName }; }
+    } catch(e) {}
+    const resp = await fetch(API + '/preferences', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
-      body: JSON.stringify({ ...prefs, chef_name: chefName })
+      body: JSON.stringify(prefs)
     });
+    if (!resp.ok) console.error('Chef name save HTTP error:', resp.status);
+    else console.log('Chef name saved:', chefName);
   } catch(e) { console.error('Chef name save failed:', e); }
-  // Update display name wherever shown
+  // Update all display references
   document.getElementById('chef-name-display').textContent = chefName;
+  updateNavChefName();
   welcomeNext(3);
+}
+
+function updateNavChefName() {
+  const el = document.getElementById('nav-chef');
+  if (el) el.textContent = chefName;
 }
 
 function filterWelcomePantry() {
@@ -1127,6 +1142,22 @@ async function skipPantrySetup() {
 }
 
 
+function openChefRename() {
+  const name = prompt('Rename your chef:', chefName);
+  if (name === null) return; // cancelled
+  chefName = name.trim() || 'Chef';
+  updateNavChefName();
+  // Save to DB
+  fetch(API + '/preferences', { headers: { 'Authorization': 'Bearer ' + userToken } })
+    .then(r => r.ok ? r.json() : {daily_calorie_goal:2000,servings:2,dietary_preferences:[]})
+    .then(prefs => fetch(API + '/preferences', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
+      body: JSON.stringify({ ...prefs, chef_name: chefName })
+    }))
+    .catch(e => console.error('Chef rename failed:', e));
+}
+
 function signOut() {
   localStorage.removeItem('mw_token');
   localStorage.removeItem('mw_user');
@@ -1155,6 +1186,7 @@ async function loadPreferences() {
     // Restore chef name
     if (prefs.chef_name) {
       chefName = prefs.chef_name;
+      updateNavChefName();
     }
     if (prefs.daily_calorie_goal) document.getElementById('calgoal').value = prefs.daily_calorie_goal;
     if (prefs.servings) document.getElementById('servings').value = prefs.servings;
