@@ -173,6 +173,8 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
 .card-action-btn{padding:5px 12px;border-radius:16px;font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--ink2);font-family:'DM Sans',sans-serif;transition:all .15s}
 .card-action-btn:hover{background:var(--card);color:var(--ink)}
 .card-action-btn.fav{border-color:#b8e8d4;color:var(--green-dark);background:var(--green-pale)}
+.card-action-btn.send-shopper{border-color:#C94B2A;color:#C94B2A;background:rgba(201,75,42,.06)}
+.card-action-btn.send-shopper:hover{background:#C94B2A;color:white}
 
 /* GROCERY LIST */
 .glp{background:var(--card);border:2px solid var(--green);border-radius:var(--radius);padding:.9rem 1.1rem;margin-bottom:.8rem;animation:fadeUp .4s .5s ease forwards;opacity:0}
@@ -1461,7 +1463,7 @@ function ingTag(ing){
 }
 
 function cardHTML(r,delay,recipeId){
-  return `<div class="rcard" style="animation-delay:${delay}s">
+  const rDataAttr = JSON.stringify(r).replace(/"/g, '&quot;'); return `<div class="rcard" style="animation-delay:${delay}s" data-recipe="${rDataAttr}">
     <div class="rch"><div><h3>${r.name}</h3><div class="pills"><span class="pill pt">⏱ ${r.time}</span><span class="pill pd">${r.difficulty}</span><span class="pill pc">${r.style}</span></div></div><div class="em">${r.emoji}</div></div>
     ${cbHTML(r)}
     <div class="rcb">
@@ -1470,9 +1472,9 @@ function cardHTML(r,delay,recipeId){
       <ol class="sol">${(r.steps||[]).map((s,n)=>`<li><span class="sn">${n+1}</span><span>${s}</span></li>`).join('')}</ol>
     </div>
     <div class="card-actions">
-      ${recipeId?`<button class="card-action-btn fav" id="fav-btn-${recipeId}" onclick="favoriteRecipe(${recipeId},this)">⭐ Save to favorites</button>`:''}
+      ${recipeId?`<button class="card-action-btn fav" id="fav-btn-${recipeId}" onclick="favoriteRecipe(${recipeId},this)">⭐ Save</button>`:''}
+      <button class="card-action-btn send-shopper" onclick="sendRecipeToShopper(this)">📨 Send to shopper</button>
       ${recipeId?`<div class="star-rating" title="Rate this recipe">${[1,2,3,4,5].map(n=>`<span class="star" onclick="rateRecipe(${recipeId},${n},this.parentElement)" title="${n} star${n>1?'s':''}">☆</span>`).join('')}</div>`:''}
-      <button class="card-action-btn" onclick="shareRecipe('${r.name.replace(/'/g,"\\'")}')">Share</button>
     </div>
   </div>`;
 }
@@ -1670,6 +1672,41 @@ async function favoriteRecipe(id, btn) {
       if (btn) { btn.textContent='✅ Saved!'; btn.disabled=true; btn.style.opacity='0.7'; }
     }
   } catch(e) { console.error(e); }
+}
+
+function sendRecipeToShopper(btn) {
+  const card = btn.closest('.rcard');
+  const r = card ? JSON.parse(card.dataset.recipe || '{}') : {};
+  const ings = r.ingredients || [];
+  const buyList = ings.filter(i => i.buy).map(i => '• ' + i.name);
+  const haveList = ings.filter(i => !i.buy).map(i => i.name);
+
+  let msg = '🍽️ Tonight: ' + r.name + ' ' + (r.emoji || '') + '\n';
+  msg += '⏱️ ' + (r.time || '~30 min') + ' · ' + (r.calories_per_serving || 0) + ' kcal/person\n\n';
+
+  if (buyList.length) {
+    msg += '🛒 NEED TO BUY (' + buyList.length + ' item' + (buyList.length > 1 ? 's' : '') + '):\n';
+    msg += buyList.join('\n') + '\n\n';
+  } else {
+    msg += '✅ We have everything — no shopping needed!\n\n';
+  }
+
+  if (haveList.length) {
+    msg += '✅ Already have: ' + haveList.slice(0, 8).join(', ') + (haveList.length > 8 ? ' + more' : '') + '\n\n';
+  }
+
+  msg += '📱 Spun on MealWheelIQ — mealwheeliq.com';
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Tonight: ' + r.name,
+      text: msg
+    }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(msg)
+      .then(() => alert('Shopping list copied! Paste it in a text or email.'))
+      .catch(() => alert(msg));
+  }
 }
 
 function shareRecipe(name){
