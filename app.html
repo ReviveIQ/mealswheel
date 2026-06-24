@@ -1311,7 +1311,9 @@ async function generateRecipe(wi) {
 
   const ingList=Array.from(selectedIngs).join(', ');
   const s=parseInt(document.getElementById('servings').value)||2;
-  const g=parseInt(document.getElementById('calgoal').value)||2000;
+  const dailyGoal=parseInt(document.getElementById('calgoal').value)||2000;
+  // Dinner = ~35% of daily calories (breakfast ~25%, lunch ~30%, snacks ~10%)
+  const g=Math.round(dailyGoal * 0.35);
   const styleGuides={"Tonight's Pick":"a flavorful satisfying weeknight dinner","Family Fave":"a crowd-pleasing family comfort food dish","Chef's Special":"an elevated technique-forward dish with bold flavors and expert technique","Something New":"a creative unexpected flavor combination","Quick Meal":"a fast under-30-minute dinner","Weekend Cook":"a slow-cooked BBQ or weekend project recipe","Comfort Food":"a warming cozy comfort food dinner","Seasonal Dish":"a fresh produce-forward seasonal recipe"};
   const styleHint=styleGuides[WHEEL_LABELS[wi]]||"a delicious dinner";
   const avoidStr=wk.length?`Do NOT repeat: ${wk.map(r=>r.name).join(', ')}.`:'';
@@ -1339,7 +1341,7 @@ Aromatics: garlic, onion (assume always on hand)
 
 ${buyInstruction}
 Flag organic:true for meats, eggs, leafy greens, thin-skin produce.
-Servings: ${s}. Daily calorie goal: ${g} kcal. ${avoidStr} ${dietStr}
+Servings: ${s}. Target ${g} kcal per serving for dinner (= 35% of ${dailyGoal} kcal daily goal — accounting for breakfast, lunch and snacks). ${avoidStr} ${dietStr}
 
 Recipe steps MUST follow professional cookbook standards (America's Test Kitchen / Bon Appétit style):
 - Lead every step with an action verb: Heat, Sear, Brown, Stir, Whisk, Fold, Simmer, Roast, Toss, Season, Garnish
@@ -1406,7 +1408,10 @@ Respond ONLY with valid JSON: {"recipes":[{"name":"Recipe Name","emoji":"🍽️
 }
 
 // ─── DISPLAY ─────────────────────────────────────────────────────────────────
-function cg(){return parseInt(document.getElementById('calgoal').value)||2000;}
+function cg(){
+  const daily=parseInt(document.getElementById('calgoal').value)||2000;
+  return Math.round(daily*0.35); // dinner target = 35% of daily
+}
 function sv(){return parseInt(document.getElementById('servings').value)||2;}
 
 function cbHTML(r){
@@ -1427,7 +1432,7 @@ function cbHTML(r){
     <div class="gbw" style="width:100%;margin-top:4px">
       <div class="gbb"><div class="gbf" style="width:${bw}%;background:${bc}"></div></div>
       <div class="gbl" style="display:flex;justify-content:space-between">
-        <span>${pct}% of ${g} kcal daily goal</span>
+        <span>${pct}% of ${g} kcal dinner target (${dailyGoal} kcal daily)</span>
         ${sourceBadge}
       </div>
     </div>
@@ -1498,7 +1503,7 @@ function buildWkCal(){
   const cards=wk.map((r,i)=>{const c=(r.calories_per_serving||0)*s,p=Math.round(c/g*100),cls=p>100?'over':p>80?'ok':'under';
     return `<div class="wcc ${cls}"><div class="wd">${DAYS[i]}</div><div class="wm">${r.name.split(' ').slice(0,3).join(' ')}</div><div class="wc2">${c} kcal</div><div style="font-size:9px;color:var(--ink3)">${p}%</div></div>`;
   }).join('');
-  document.getElementById('wcalsec').innerHTML=`<div class="wcs"><h4>📊 Week overview — avg ${avg} kcal/night · goal ${g} kcal/day</h4><div class="wcg">${cards}</div></div>`;
+  document.getElementById('wcalsec').innerHTML=`<div class="wcs"><h4>📊 Week overview — avg ${avg} kcal/dinner · target ~${g} kcal/dinner</h4><div class="wcg">${cards}</div></div>`;
 }
 
 function buildGL(){
