@@ -1313,33 +1313,48 @@ async function generateRecipe(wi) {
   const avoidStr=wk.length?`Do NOT repeat: ${wk.map(r=>r.name).join(', ')}.`:'';
   const dietStr=getDietPromptText();
   const count=mode==='week'?1:3;
-  const buyRule = mode==='week'
-    ? 'You may suggest additional ingredients to buy as needed — mark them buy:true.'
-    : 'STRICT PANTRY RULE: no more than 40% of ingredients may have buy:true. Prioritize what the user already has.';
+  // Recipe index 2 = "stretch" recipe with ~30% buy ingredients for meal inspiration
+  const makePrompt = (recipeIndex) => {
+    const isStretch = recipeIndex === 2 && mode !== 'week';
+    const buyInstruction = mode === 'week'
+      ? 'You may suggest additional ingredients to buy as needed — mark them buy:true.'
+      : isStretch
+        ? 'INSPIRATION RECIPE: Include 2–4 exciting ingredients to buy (buy:true) that complement what the user has. About 30% of ingredients should be buy:true. This expands their meal ideas beyond the pantry.'
+        : 'PANTRY RULE: Maximum 2 ingredients should be buy:true. Build the recipe around what the user already has.';
 
-  // Build single-recipe prompt — fire in parallel for speed
-  const makePrompt = () => `You are ${chefName}, a professional chef with expertise in bold flavors, live-fire cooking, and fresh ingredients. Generate 1 dinner recipe that is ${styleHint}.
+    return `You are ${chefName}, a professional chef with expertise in bold flavors, live-fire cooking, and fresh ingredients. Generate 1 dinner recipe that is ${styleHint}.
+
 User's available ingredients: ${ingList}
-Requirements: use primarily these ingredients, flag buy:true for extras needed (max 3), flag organic:true for meats/eggs/leafy greens/thin-skin produce, servings: ${s}, daily calorie goal: ${g} kcal. ${avoidStr} ${dietStr}
-${buyRule}
 
-Recipe steps MUST follow professional cookbook standards (America's Test Kitchen / Bon Appetit style):
+ASSUMED KITCHEN STAPLES (always available — never mark these buy:true):
+Fats: olive oil, vegetable oil, butter
+Seasonings: salt, black pepper, garlic powder, onion powder, paprika, cumin, chili powder, oregano, thyme, rosemary, red pepper flakes, Italian seasoning, cinnamon
+Condiments: soy sauce, Worcestershire sauce, hot sauce, Dijon mustard, ketchup, mayonnaise, honey, vinegar
+Pantry: flour, sugar, cornstarch, chicken broth, beef broth
+Aromatics: garlic, onion (assume always on hand)
+
+${buyInstruction}
+Flag organic:true for meats, eggs, leafy greens, thin-skin produce.
+Servings: ${s}. Daily calorie goal: ${g} kcal. ${avoidStr} ${dietStr}
+
+Recipe steps MUST follow professional cookbook standards (America's Test Kitchen / Bon Appétit style):
 - Lead every step with an action verb: Heat, Sear, Brown, Stir, Whisk, Fold, Simmer, Roast, Toss, Season, Garnish
 - Combine actions that happen together — never split "add X" and "stir X" into separate steps
 - Group all ingredients added at the same time into one step
 - Include timing AND visual cues: "cook until golden brown, about 4 minutes" not just "cook chicken"
 - Organize by cooking phase: Prep → Sear → Build flavor → Simmer or Bake → Finish → Serve
-- Final step must include: taste, season with salt and pepper, and a service instruction (e.g. "Serve hot" or "Spoon over rice and serve")
-- Target 5–7 steps total. Maximum 8 steps. Eliminate all micro-steps and obvious actions.
+- Final step: taste, season with salt and pepper, and a service instruction
+- Target 5–7 steps. Maximum 8. Eliminate all micro-steps.
 - Never use passive voice. Never start a step with "The", "Once", or "After".
 Respond ONLY with valid JSON: {"recipes":[{"name":"Recipe Name","emoji":"🍽️","time":"30 min","difficulty":"Easy","style":"American","calories_per_serving":520,"protein_g":38,"carbs_g":45,"fat_g":18,"ingredients":[{"name":"ingredient","organic":false,"buy":false}],"steps":["Heat oil in a large skillet over medium-high heat.","Sear chicken until golden brown, about 4 minutes per side. Transfer to a plate.","Add onion and cook until softened, about 3 minutes. Stir in garlic and cook 1 minute more.","Pour in broth, scraping up any browned bits. Return chicken to the pan, cover, and simmer until cooked through, about 15 minutes.","Taste, season with salt and pepper, and serve hot."]}]}`;
+  };
 
-  // Fire count requests in parallel (3 for normal, 1 for week mode)
-  const parallelRequests = Array.from({length: count}, () =>
+  // Fire count requests in parallel — pass recipe index so index 2 gets stretch treatment
+  const parallelRequests = Array.from({length: count}, (_, i) =>
     fetch(API+'/generate', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+userToken},
-      body:JSON.stringify({prompt: makePrompt()})
+      body:JSON.stringify({prompt: makePrompt(i)})
     })
   );
 
