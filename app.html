@@ -1738,13 +1738,28 @@ async function loadFavorites(){
 }
 
 async function favoriteRecipe(id, btn) {
-  if (!id) return;
+  if (!id) { 
+    if (btn) { btn.textContent='⚠️ No ID'; }
+    console.error('favoriteRecipe: no id provided');
+    return; 
+  }
+  if (btn) { btn.textContent='Saving...'; btn.disabled=true; }
   try {
-    const resp = await fetch(API+'/favorites/'+id, {method:'POST',headers:{'Authorization':'Bearer '+userToken}});
+    const resp = await fetch(API+'/favorites/'+id, {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+userToken}
+    });
+    const data = await resp.json();
     if (resp.ok) {
-      if (btn) { btn.textContent='✅ Saved!'; btn.disabled=true; btn.style.opacity='0.7'; }
+      if (btn) { btn.textContent='✅ Saved!'; btn.style.opacity='0.7'; }
+    } else {
+      if (btn) { btn.textContent='⭐ Save'; btn.disabled=false; }
+      console.error('Favorite failed:', resp.status, data);
     }
-  } catch(e) { console.error(e); }
+  } catch(e) { 
+    if (btn) { btn.textContent='⭐ Save'; btn.disabled=false; }
+    console.error('Favorite error:', e); 
+  }
 }
 
 function sendRecipeToShopper(btn) {
