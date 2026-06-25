@@ -3,9 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="apple-touch-icon" href="favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MealWheelIQ — Let's Cook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -982,6 +980,8 @@ function renderTonightList() {
 async function savePantryAndClose() {
   // Sync selectedIngs immediately so spin works right away
   selectedIngs = new Set([...pantryItems, ...tonightItems]);
+  // Track when pantry was last updated
+  localStorage.setItem('mwiq_pantry_updated_' + (userInfo?.id || 'anon'), Date.now().toString());
   // Save to DB
   try {
     const resp = await fetch(API+'/pantry', {
@@ -1003,13 +1003,21 @@ async function loadPantryFromDB() {
   try {
     const resp = await fetch(API+'/pantry', { headers: {'Authorization':'Bearer '+userToken} });
     const data = await resp.json();
-    if (data.ingredients && data.ingredients.length) {
-      pantryItems = new Set(data.ingredients);
+    // Server returns plain array of ingredient names
+    const ingredients = Array.isArray(data) ? data : (data.ingredients || []);
+    if (ingredients.length) {
+      pantryItems = new Set(ingredients);
       selectedIngs = new Set([...pantryItems, ...tonightItems]);
       renderPantrySummary();
       renderPantryTags();
+      // Check if pantry is more than 7 days old — if so, ask "what's new?"
+      const lastUpdate = localStorage.getItem('mwiq_pantry_updated_' + userInfo.id);
+      const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      if (!lastUpdate || parseInt(lastUpdate) < weekAgo) {
+        setTimeout(() => openWhatsNewModal(), 1200);
+      }
     } else {
-      // First time — show welcome onboarding after wheel renders
+      // No pantry yet — show welcome or pantry modal
       setTimeout(() => {
         if (!localStorage.getItem('mwiq_onboarded_' + userInfo.id)) {
           showWelcome();
@@ -1141,6 +1149,7 @@ async function saveWelcomePantryAndSpin() {
   renderPantrySummary();
   // Mark onboarding complete in localStorage
   localStorage.setItem('mwiq_onboarded_' + userInfo.id, '1');
+  localStorage.setItem('mwiq_pantry_updated_' + userInfo.id, Date.now().toString());
   document.getElementById('sbtn').focus();
 }
 
@@ -1149,6 +1158,68 @@ async function skipPantrySetup() {
   hideWelcome();
 }
 
+
+function openWhatsNewModal() {
+  // Simple prompt — "anything new in the fridge this week?"
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'whats-new-modal';
+  modal.innerHTML = `
+    <div class="modal-box" style="max-width:420px">
+      <div class="modal-header">
+        <h2>👋 Welcome back!</h2>
+        <p>Your pantry is saved from last time. Anything new in the fridge or freezer this week?</p>
+      </div>
+      <div style="padding:1rem 1.4rem">
+        <div class="pantry-search-row">
+          <input type="text" id="new-item-input" placeholder="Add new ingredients..." 
+            style="font-size:16px" autocomplete="off"
+            onkeydown="if(event.key==='Enter')addNewPantryItem()">
+          <button class="pantry-add-btn" onclick="addNewPantryItem()">+ Add</button>
+        </div>
+        <div id="new-items-list" style="display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0;min-height:28px"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="pantry-count-label">${pantryItems.size} items already in your pantry</div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="closeWhatsNew()">Nothing new — let's spin</button>
+          <button class="btn-primary" onclick="saveWhatsNew()">Update & Spin 🎰</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('new-item-input')?.focus();
+}
+
+function addNewPantryItem() {
+  const input = document.getElementById('new-item-input');
+  const val = input?.value.trim();
+  if (!val) return;
+  pantryItems.add(val);
+  input.value = '';
+  const list = document.getElementById('new-items-list');
+  if (list) list.innerHTML = [...pantryItems].slice(-10).map(i =>
+    `<span class="ps-tag">${i}</span>`).join('');
+}
+
+function closeWhatsNew() {
+  document.getElementById('whats-new-modal')?.remove();
+  localStorage.setItem('mwiq_pantry_updated_' + userInfo.id, Date.now().toString());
+}
+
+async function saveWhatsNew() {
+  selectedIngs = new Set([...pantryItems, ...tonightItems]);
+  localStorage.setItem('mwiq_pantry_updated_' + userInfo.id, Date.now().toString());
+  try {
+    await fetch(API+'/pantry', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+userToken},
+      body: JSON.stringify({ ingredients: [...pantryItems] })
+    });
+  } catch(e) { console.error(e); }
+  document.getElementById('whats-new-modal')?.remove();
+  renderPantrySummary();
+}
 
 function signOut() {
   localStorage.removeItem('mw_token');
