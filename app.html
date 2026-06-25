@@ -232,15 +232,15 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
 .fav-action-btn.remove:hover{background:#FDF0F0}
 @media(max-width:600px){.fav-action-btn{flex:1;text-align:center;min-height:40px}}
 /* ── WELCOME ONBOARDING ── */
-.welcome-box{max-width:460px;padding:0}
+.welcome-box{max-width:500px;padding:0}
 .welcome-step{padding:2rem 1.75rem}
 .welcome-emoji{font-size:48px;margin-bottom:.75rem;text-align:center}
 .welcome-box h2{font-size:22px;font-weight:700;text-align:center;margin-bottom:.5rem;color:var(--ink1)}
 .welcome-box p{font-size:14px;color:var(--ink2);text-align:center;line-height:1.6;margin-bottom:1.25rem}
 .welcome-steps-preview{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem;background:var(--bg);border-radius:12px;padding:1rem}
 .wsp{display:flex;align-items:center;gap:.75rem}
-.wsp span{font-size:24px;width:36px;text-align:center}
-.wsp strong{display:block;font-size:13px;color:var(--ink1)}
+.wsp span{font-size:28px;width:40px;text-align:center}
+.wsp strong{display:block;font-size:14px;color:var(--ink1)}
 .wsp small{font-size:12px;color:var(--ink2)}
 .btn-full{width:100%;padding:.75rem;font-size:15px;border-radius:12px}
 .chef-name-row{margin-bottom:.75rem}
@@ -495,49 +495,54 @@ button, a { touch-action: manipulation; }
 
       <!-- Step 1: Welcome -->
       <div class="welcome-step" id="ws-1">
-        <div class="welcome-emoji">🍽️</div>
-        <h2>Welcome to MealWheelIQ</h2>
-        <p>No more "what's for dinner?" — spin the wheel, get a recipe from your actual kitchen.</p>
+        <div class="welcome-emoji" style="font-size:56px">🎉</div>
+        <h2 style="font-size:26px;line-height:1.2">No more<br><em style="color:var(--coral)">"What's for dinner?!"</em></h2>
+        <p style="font-size:15px;margin-bottom:1.25rem">MealWheelIQ spins up real dinner recipes from whatever's already in your kitchen. Easy, fun, and done in seconds!</p>
         <div class="welcome-steps-preview">
-          <div class="wsp"><span>🛒</span><div><strong>Stock your kitchen</strong><small>Add what you have</small></div></div>
-          <div class="wsp"><span>🎰</span><div><strong>Spin the wheel</strong><small>Get 3 recipe ideas</small></div></div>
-          <div class="wsp"><span>🍳</span><div><strong>Cook tonight</strong><small>Step-by-step guidance</small></div></div>
+          <div class="wsp"><span>👨‍🍳</span><div><strong style="font-size:14px">Name your personal chef</strong><small>Give them a fun, silly name!</small></div></div>
+          <div class="wsp"><span>🛒</span><div><strong style="font-size:14px">Stock your kitchen</strong><small>Just tap what you have</small></div></div>
+          <div class="wsp"><span>🎰</span><div><strong style="font-size:14px">Spin the wheel</strong><small>Get 3 dinner ideas instantly</small></div></div>
+          <div class="wsp"><span>🍳</span><div><strong style="font-size:14px">Cook & enjoy!</strong><small>Step-by-step, super easy</small></div></div>
         </div>
-        <button class="btn-primary btn-full" onclick="welcomeNext(2)">Let's get started →</button>
+        <button class="btn-primary btn-full" onclick="welcomeNext(2)" style="font-size:17px;padding:1rem">Let's go! 🚀</button>
       </div>
 
       <!-- Step 2: Name your chef -->
       <div class="welcome-step hidden" id="ws-2">
-        <div class="welcome-emoji">👨‍🍳</div>
-        <h2>Name your personal chef</h2>
-        <p>Your AI chef will generate every recipe. Give them a name that feels right for your kitchen.</p>
+        <div class="welcome-emoji" style="font-size:52px">👨‍🍳</div>
+        <h2 style="font-size:24px">First things first —<br>name your chef!</h2>
+        <p style="font-size:14px">Your personal AI chef will cook up dinner ideas every night. Give them a name — silly, fancy, or totally made up. Your call!</p>
         <div class="chef-name-row">
-          <input type="text" id="chef-name-input" class="chef-name-input" 
-            placeholder="e.g. Chef Marco, Chef Bella..." 
+          <input type="text" id="chef-name-input" class="chef-name-input"
+            placeholder="Type a name or pick one below..."
             maxlength="30"
             oninput="updateChefPreview()">
         </div>
         <div class="chef-preview" id="chef-preview">
-          <span id="chef-preview-text">Your chef will introduce themselves here...</span>
+          <span id="chef-preview-text">👆 Type a name or tap one below!</span>
         </div>
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;text-align:center">✨ Fun ideas to get you started:</div>
         <div class="chef-suggestions">
-          <span class="chef-sug" onclick="setChefName('Chef Marco')">Chef Marco</span>
-          <span class="chef-sug" onclick="setChefName('Chef Bella')">Chef Bella</span>
-          <span class="chef-sug" onclick="setChefName('Chef Jordan')">Chef Jordan</span>
-          <span class="chef-sug" onclick="setChefName('Chef Kai')">Chef Kai</span>
-          <span class="chef-sug" onclick="setChefName('Chef Rivera')">Chef Rivera</span>
+          <span class="chef-sug" onclick="setChefName('Chef Noodles')">🍝 Chef Noodles</span>
+          <span class="chef-sug" onclick="setChefName('Chef Sizzle')">🔥 Chef Sizzle</span>
+          <span class="chef-sug" onclick="setChefName('Chef Waffles')">🧇 Chef Waffles</span>
+          <span class="chef-sug" onclick="setChefName('Chef Taco')">🌮 Chef Taco</span>
+          <span class="chef-sug" onclick="setChefName('Chef Sprinkles')">✨ Chef Sprinkles</span>
+          <span class="chef-sug" onclick="setChefName('Chef Biscuit')">🍪 Chef Biscuit</span>
+          <span class="chef-sug" onclick="setChefName('Chef Mango')">🥭 Chef Mango</span>
+          <span class="chef-sug" onclick="setChefName('Chef Ziggy')">⚡ Chef Ziggy</span>
         </div>
         <div class="welcome-nav">
           <button class="btn-ghost" onclick="welcomeNext(1)">← Back</button>
-          <button class="btn-primary" onclick="saveChefAndNext()">Looks good →</button>
+          <button class="btn-primary" onclick="saveChefAndNext()" style="font-size:15px">That's my chef! →</button>
         </div>
       </div>
 
       <!-- Step 3: Stock kitchen -->
       <div class="welcome-step hidden" id="ws-3">
-        <div class="welcome-emoji">🛒</div>
-        <h2>What's in your kitchen?</h2>
-        <p>Add what you have in your fridge, pantry, and freezer. <strong id="chef-name-display">Your chef</strong> will build recipes around it.</p>
+        <div class="welcome-emoji" style="font-size:52px">🛒</div>
+        <h2 style="font-size:24px">What's in your kitchen?</h2>
+        <p style="font-size:14px">Tap everything you have in your fridge, freezer, and pantry. Don't worry about spices or oil — <strong id="chef-name-display">your chef</strong> assumes you have the basics!</p>
         <div class="pantry-search-row">
           <input type="text" id="welcome-pantry-search" placeholder="Search ingredients..." 
             oninput="filterWelcomePantry()" autocomplete="off">
@@ -549,11 +554,11 @@ button, a { touch-action: manipulation; }
         <div class="welcome-pantry-selected" id="welcome-pantry-selected"></div>
         <div class="welcome-nav">
           <button class="btn-ghost" onclick="welcomeNext(2)">← Back</button>
-          <button class="btn-primary" onclick="saveWelcomePantryAndSpin()">
-            Save & Start Spinning 🎰
+          <button class="btn-primary" onclick="saveWelcomePantryAndSpin()" style="font-size:15px">
+            Save & Let's Spin! 🎰
           </button>
         </div>
-        <button class="skip-link" onclick="skipPantrySetup()">Skip for now — I'll add ingredients later</button>
+        <button class="skip-link" onclick="skipPantrySetup()">⏭️ Skip for now, I'll add these later</button>
       </div>
 
     </div>
@@ -1658,7 +1663,7 @@ async function sendToShopper(id) {
     const r = recipes.find(x => x.id === id);
     if (!r) return;
 
-    const ings = JSON.parse(r.ingredients||'[]');
+    const ings = typeof r.ingredients === 'string' ? JSON.parse(r.ingredients||'[]') : (r.ingredients||[]);
     const buyList = ings.filter(i=>i.buy).map(i=>'• '+i.name);
     const haveList = ings.filter(i=>!i.buy).map(i=>i.name);
 
@@ -1714,7 +1719,7 @@ async function loadFavorites(){
     const el=document.getElementById('favorites-list');
     if(!recipes.length){el.innerHTML='<div class="empty-state">Heart a recipe after spinning to save it here.</div>';return;}
     el.innerHTML=recipes.map(r=>{
-      const ings = JSON.parse(r.ingredients||'[]');
+      const ings = typeof r.ingredients === 'string' ? typeof r.ingredients === 'string' ? JSON.parse(r.ingredients||'[]') : (r.ingredients||[]) : (r.ingredients||[]);
       const buyList = ings.filter(i=>i.buy).map(i=>i.name);
       const haveList = ings.filter(i=>!i.buy);
       return `
@@ -1734,7 +1739,7 @@ async function loadFavorites(){
         </div>
       </div>`;
     }).join('');
-  } catch {}
+  } catch(e) { console.error('loadFavorites error:', e); }
 }
 
 async function favoriteRecipe(id, btn) {
