@@ -1006,30 +1006,33 @@ async function savePantryAndClose() {
 // Load pantry from DB on init (called after auth)
 async function loadPantryFromDB() {
   try {
+    // ALWAYS check onboarding first — new users on any device should see the welcome
+    const hasOnboarded = localStorage.getItem('mwiq_onboarded_' + userInfo.id);
+
     const resp = await fetch(API+'/pantry', { headers: {'Authorization':'Bearer '+userToken} });
     const data = await resp.json();
-    // Server returns plain array of ingredient names
     const ingredients = Array.isArray(data) ? data : (data.ingredients || []);
+
     if (ingredients.length) {
       pantryItems = new Set(ingredients);
       selectedIngs = new Set([...pantryItems, ...tonightItems]);
       renderPantrySummary();
       renderPantryTags();
-      // Check if pantry is more than 7 days old — if so, ask "what's new?"
+    }
+
+    if (!hasOnboarded) {
+      // First time on this device — always show welcome flow
+      setTimeout(() => showWelcome(), 800);
+    } else if (!ingredients.length) {
+      // Onboarded before but pantry is empty — open pantry modal
+      setTimeout(() => openPantryModal(), 800);
+    } else {
+      // Returning user with pantry — check if 7 days old
       const lastUpdate = localStorage.getItem('mwiq_pantry_updated_' + userInfo.id);
       const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
       if (!lastUpdate || parseInt(lastUpdate) < weekAgo) {
         setTimeout(() => openWhatsNewModal(), 1200);
       }
-    } else {
-      // No pantry yet — show welcome or pantry modal
-      setTimeout(() => {
-        if (!localStorage.getItem('mwiq_onboarded_' + userInfo.id)) {
-          showWelcome();
-        } else {
-          openPantryModal();
-        }
-      }, 1000);
     }
   } catch(e) { console.error('Pantry load failed:', e); }
 }
