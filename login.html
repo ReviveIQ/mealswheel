@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="apple-touch-icon" href="favicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#C94B2A">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MealWheelIQ">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MealWheelIQ — Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -251,5 +260,15 @@ if (params.get('subscribed') === 'true') showSuccess('Subscription activated! We
 if (params.get('cancelled') === 'true') showError('Checkout cancelled — you can upgrade anytime.');
 if (params.get('session') === 'expired') showError('Session expired. Please sign in again.');
 </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(r => console.log('SW registered'))
+          .catch(e => console.log('SW failed:', e));
+      });
+    }
+  </script>
 </body>
 </html>
