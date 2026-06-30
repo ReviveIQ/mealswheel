@@ -1658,7 +1658,7 @@ Condiments: soy sauce, Worcestershire sauce, hot sauce, Dijon mustard, ketchup, 
 Pantry: flour, sugar, cornstarch, chicken broth, beef broth
 Aromatics: garlic, onion (assume always on hand)
 
-You may suggest additional ingredients to buy as needed — mark them buy:true. Flag organic:true for meats, eggs, leafy greens, thin-skin produce.
+WEEK PLANNING MODE: This is a full week of dinners, not a single pantry-clearing meal. Each night should feel like a real, varied dinner — don't force every night to reuse the same 2-3 proteins from the pantry. Actively suggest fresh proteins, vegetables, and pantry items to buy (mark buy:true) so the week feels balanced and exciting, not repetitive. Aim for at least 3-5 ingredients per recipe that are fresh additions to buy, especially proteins and vegetables, unless the user's pantry is already well-stocked for that night. Flag organic:true for meats, eggs, leafy greens, thin-skin produce.
 Servings: ${s}. Target approximately ${g} kcal per serving for dinner. ${avoidStr} ${dietStr}
 
 Recipe steps MUST follow professional cookbook standards (America's Test Kitchen / Bon Appétit style):
@@ -1945,10 +1945,10 @@ function buildWkCal(){
 
 function buildGL(){
   const cats={'Proteins — choose organic':[],'Produce — organic priority':[],'Pantry & dry goods':[],'Dairy & refrigerated':[],'Spices & sauces':[]};
-  const PROT=['beef','chicken','pork','salmon','shrimp','sausage','bacon','egg','rib','fish','tuna','cod','turkey','duck'];
-  const PROD=['potato','sweet potato','carrot','squash','zucchini','pepper','spinach','broccoli','onion','garlic','lemon','lime','asparagus','cabbage','avocado','tomato','mushroom','kale','eggplant','corn'];
-  const DAIRY=['cheese','cheddar','parmesan','butter','cream','milk','sour cream','yogurt','mozzarella','ricotta','feta','goat'];
-  const PANT=['pasta','noodle','rice','bread','bun','roll','tortilla','bean','broth','tomato','oil','vinegar','sauce','maple','peanut','pancake','breadcrumb','caper','wine','naan','flour'];
+  const PROT=['beef','chicken','pork','salmon','shrimp','sausage','bacon','egg','rib','fish','tuna','cod','turkey','duck','lamb','steak','ground','tilapia','crab','lobster','scallop','tofu','tempeh','chorizo','ham','prosciutto','salami','pepperoni','meatball'];
+  const PROD=['potato','sweet potato','carrot','squash','zucchini','pepper','spinach','broccoli','onion','garlic','lemon','lime','asparagus','cabbage','avocado','tomato','mushroom','kale','eggplant','corn','cucumber','celery','lettuce','arugula','radish','beet','turnip','leek','scallion','shallot','herb','cilantro','parsley','basil','dill','mint','chive','ginger','jalapeno','jalapeño','chili pepper','green bean','pea','okra','fennel','brussels'];
+  const DAIRY=['cheese','cheddar','parmesan','butter','cream','milk','sour cream','yogurt','mozzarella','ricotta','feta','goat','cottage cheese','provolone','swiss','gouda','brie'];
+  const PANT=['pasta','noodle','rice','bread','bun','roll','tortilla','bean','broth','tomato sauce','oil','vinegar','sauce','maple','peanut','pancake','breadcrumb','caper','wine','naan','flour','quinoa','couscous','oats','cereal','cracker','chip','stock','soup','salsa','pesto','mustard','ketchup','mayo','jam','jelly','honey','sugar','spice','seasoning'];
   const seen=new Set();
   wk.flatMap(r=>(r.ingredients||[]).filter(i=>i.buy)).forEach(ing=>{
     const k=ing.name.toLowerCase();if(seen.has(k))return;seen.add(k);
