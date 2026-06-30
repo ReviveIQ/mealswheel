@@ -231,6 +231,19 @@ canvas{border-radius:50%;display:block;box-shadow:0 4px 24px rgba(0,0,0,.12)}
 .fav-action-btn.remove{color:#C0392B;border-color:rgba(192,57,43,.2)}
 .fav-action-btn.remove:hover{background:#FDF0F0}
 @media(max-width:600px){.fav-action-btn{flex:1;text-align:center;min-height:40px}}
+/* ── CRAVING / VOICE INPUT ── */
+.craving-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:1rem}
+.craving-label{font-size:13px;font-weight:600;color:var(--ink1);margin-bottom:.5rem}
+.craving-optional{font-size:11px;color:var(--ink3);font-weight:400}
+.craving-input-row{display:flex;gap:.5rem}
+.craving-input-row input{flex:1;padding:.65rem .85rem;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink1)}
+.craving-input-row input:focus{outline:none;border-color:var(--coral)}
+.mic-btn{width:44px;height:44px;border-radius:10px;border:1.5px solid var(--border);background:white;font-size:18px;cursor:pointer;flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.mic-btn:hover{border-color:var(--coral);background:var(--coral-pale,#FAF0EB)}
+.mic-btn.listening{background:var(--coral);border-color:var(--coral);animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,75,42,.4)}50%{box-shadow:0 0 0 8px rgba(201,75,42,0)}}
+.craving-listening{font-size:12px;color:var(--coral);font-weight:600;margin-top:.5rem;text-align:center}
+
 /* ── MEAL PLANS ── */
 .mealplan-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.75rem}
 .mealplan-header{font-size:14px;font-weight:700;color:var(--ink1);margin-bottom:.65rem}
@@ -704,6 +717,15 @@ button, a { touch-action: manipulation; }
         <div class="pb-bg"><div class="pb-fill" id="pbfill" style="width:0"></div></div>
         <div class="pb-labels"><span id="pbl"></span><span id="pbr"></span></div>
       </div>
+    </div>
+
+    <div class="craving-panel">
+      <div class="craving-label">What are you in the mood for? <span class="craving-optional">(optional)</span></div>
+      <div class="craving-input-row">
+        <input type="text" id="craving-input" placeholder="e.g. something spicy, Mexican, not too heavy..." maxlength="200">
+        <button class="mic-btn" id="mic-btn" onclick="toggleVoiceCraving()" title="Tap to speak">🎤</button>
+      </div>
+      <div class="craving-listening hidden" id="craving-listening">🎙️ Listening... speak now</div>
     </div>
 
     <div class="mode-sw" id="mode-sw">
@@ -1469,6 +1491,68 @@ function confirmScanItems() {
   }
 }
 
+// ─── VOICE CRAVING INPUT ──────────────────────────────────────────────────────
+let recognition = null;
+let isListening = false;
+
+function getCravingText() {
+  return document.getElementById('craving-input')?.value.trim() || '';
+}
+
+function toggleVoiceCraving() {
+  if (isListening) {
+    stopVoiceCraving();
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Voice input isn\'t supported on this browser. Try typing your craving instead, or use Safari/Chrome.');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  const micBtn = document.getElementById('mic-btn');
+  const listeningEl = document.getElementById('craving-listening');
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('listening');
+    micBtn.textContent = '⏹️';
+    listeningEl.classList.remove('hidden');
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById('craving-input');
+    input.value = transcript;
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Voice recognition error:', event.error);
+    if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+      alert('Microphone access was denied. Please allow microphone access to use voice input.');
+    }
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+    listeningEl.classList.add('hidden');
+  };
+
+  recognition.start();
+}
+
+function stopVoiceCraving() {
+  if (recognition) recognition.stop();
+}
+
 function signOut() {
   localStorage.removeItem('mw_token');
   localStorage.removeItem('mw_user');
@@ -1665,9 +1749,14 @@ async function generateFullWeek() {
   const dietStr = getDietPromptText();
   const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 
+  const weekCravingText = getCravingText();
+  const cravingLine = weekCravingText
+    ? `\nThe user wants this week to lean toward: "${weekCravingText}". Use this as the guiding theme across all 5 nights, while still keeping each night distinct.`
+    : '';
+
   const makeWeekPrompt = (dayIndex, avoidNames) => {
     const avoidStr = avoidNames.length ? `Do NOT repeat any of: ${avoidNames.join(', ')}.` : '';
-    return `You are ${chefName}, a professional chef with expertise in bold flavors, live-fire cooking, and fresh ingredients. Generate 1 dinner recipe for ${dayNames[dayIndex]} — make it distinctly different in style and protein from other nights this week.
+    return `You are ${chefName}, a professional chef with expertise in bold flavors, live-fire cooking, and fresh ingredients. Generate 1 dinner recipe for ${dayNames[dayIndex]} — make it distinctly different in style and protein from other nights this week.${cravingLine}
 
 User's available ingredients: ${ingList}
 
@@ -1772,7 +1861,12 @@ async function generateRecipe(wi) {
   // Dinner = ~35% of daily calories (breakfast ~25%, lunch ~30%, snacks ~10%)
   const g=Math.round(dailyGoal * 0.35);
   const styleGuides={"Tonight's Pick":"a flavorful satisfying weeknight dinner","Family Fave":"a crowd-pleasing family comfort food dish","Chef's Special":"an elevated technique-forward dish with bold flavors and expert technique","Something New":"a creative unexpected flavor combination","Quick Meal":"a fast under-30-minute dinner","Weekend Cook":"a slow-cooked BBQ or weekend project recipe","Comfort Food":"a warming cozy comfort food dinner","Seasonal Dish":"a fresh produce-forward seasonal recipe"};
-  const styleHint=styleGuides[WHEEL_LABELS[wi]]||"a delicious dinner";
+  const wheelCategoryHint=styleGuides[WHEEL_LABELS[wi]]||"a delicious dinner";
+  const cravingText=getCravingText();
+  // Voice/typed craving takes priority — wheel category becomes secondary flavor direction
+  const styleHint=cravingText
+    ? `something matching this craving: "${cravingText}" — while keeping the spirit of ${wheelCategoryHint}`
+    : wheelCategoryHint;
   const avoidStr=wk.length?`Do NOT repeat: ${wk.map(r=>r.name).join(', ')}.`:'';
   const dietStr=getDietPromptText();
   const count=mode==='week'?1:3;
